@@ -3,29 +3,29 @@
 -- ============================================================
 
 -- Uploaded documents per society
-CREATE TABLE ai_documents (
-    documentId      UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    societyId       INT NOT NULL,
-    fileName        NVARCHAR(255) NOT NULL,
-    fileType        NVARCHAR(50),            -- 'pdf' | 'docx' | 'txt'
-    filePath        NVARCHAR(500),
-    uploadedBy      INT NOT NULL,
-    uploadedOn      DATETIME DEFAULT GETDATE(),
-    isActive        BIT DEFAULT 1,
-    chunkCount      INT DEFAULT 0
+CREATE TABLE IF NOT EXISTS ai_documents (
+    documentId      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    societyId       INTEGER NOT NULL,
+    fileName        VARCHAR(255) NOT NULL,
+    fileType        VARCHAR(50),            -- 'pdf' | 'docx' | 'txt'
+    filePath        VARCHAR(500),
+    uploadedBy      INTEGER NOT NULL,
+    uploadedOn      TIMESTAMPTZ DEFAULT NOW(),
+    isActive        BOOLEAN DEFAULT TRUE,
+    chunkCount      INTEGER DEFAULT 0
 );
 
--- Document chunks with embeddings (stored as JSON string for SQL Server compatibility)
--- For production, use ChromaDB or pgvector instead
-CREATE TABLE ai_document_chunks (
-    chunkId         INT IDENTITY(1,1) PRIMARY KEY,
-    documentId      UNIQUEIDENTIFIER NOT NULL REFERENCES ai_documents(documentId),
-    societyId       INT NOT NULL,
-    chunkIndex      INT NOT NULL,
-    content         NVARCHAR(MAX) NOT NULL,
-    embedding       NVARCHAR(MAX),           -- JSON array of floats
-    createdOn       DATETIME DEFAULT GETDATE()
+-- Document chunks with embeddings (stored as JSONB for PostgreSQL)
+-- For production, enable pgvector extension for native vector similarity search
+CREATE TABLE IF NOT EXISTS ai_document_chunks (
+    chunkId         SERIAL PRIMARY KEY,
+    documentId      UUID NOT NULL REFERENCES ai_documents(documentId),
+    societyId       INTEGER NOT NULL,
+    chunkIndex      INTEGER NOT NULL,
+    content         TEXT NOT NULL,
+    embedding       JSONB,           -- JSON array of floats
+    createdOn       TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_ai_chunks_documentId ON ai_document_chunks(documentId);
-CREATE INDEX idx_ai_chunks_societyId ON ai_document_chunks(societyId);
+CREATE INDEX IF NOT EXISTS idx_ai_chunks_documentId ON ai_document_chunks(documentId);
+CREATE INDEX IF NOT EXISTS idx_ai_chunks_societyId ON ai_document_chunks(societyId);

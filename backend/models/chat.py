@@ -23,8 +23,7 @@ class ChatResponse(BaseModel):
     reply: str
     intent: str
     sessionId: str
-    complaintDraft: Optional[dict] = None   # populated if complaint intent
-    requiresConfirmation: bool = False
+    complaintDraft: Optional[dict] = None
 
 
 class UserContext(BaseModel):

@@ -3,37 +3,37 @@
 -- ============================================================
 
 -- One session per user login
-CREATE TABLE ai_chat_sessions (
-    sessionId       UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
-    userId          INT NOT NULL,
-    societyId       INT NOT NULL,
-    buildingId      INT,
-    flatId          INT,
-    startedOn       DATETIME DEFAULT GETDATE(),
-    lastActiveOn    DATETIME DEFAULT GETDATE(),
-    isActive        BIT DEFAULT 1
+CREATE TABLE IF NOT EXISTS ai_chat_sessions (
+    sessionId       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    userId          INTEGER NOT NULL,
+    societyId       INTEGER NOT NULL,
+    buildingId      INTEGER,
+    flatId          INTEGER,
+    startedOn       TIMESTAMPTZ DEFAULT NOW(),
+    lastActiveOn    TIMESTAMPTZ DEFAULT NOW(),
+    isActive        BOOLEAN DEFAULT TRUE
 );
 
 -- Individual messages in a session
-CREATE TABLE ai_chat_messages (
-    messageId       INT IDENTITY(1,1) PRIMARY KEY,
-    sessionId       UNIQUEIDENTIFIER NOT NULL REFERENCES ai_chat_sessions(sessionId),
-    role            NVARCHAR(20) NOT NULL,   -- 'user' | 'assistant'
-    content         NVARCHAR(MAX) NOT NULL,
-    intent          NVARCHAR(50),            -- 'complaint' | 'document_qa' | 'general'
-    createdOn       DATETIME DEFAULT GETDATE()
+CREATE TABLE IF NOT EXISTS ai_chat_messages (
+    messageId       SERIAL PRIMARY KEY,
+    sessionId       UUID NOT NULL REFERENCES ai_chat_sessions(sessionId),
+    role            VARCHAR(20) NOT NULL,   -- 'user' | 'assistant'
+    content         TEXT NOT NULL,
+    intent          VARCHAR(50),            -- 'complaint' | 'document_qa' | 'general'
+    createdOn       TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Questions the bot could not answer (for secretary review)
-CREATE TABLE ai_unanswered_questions (
-    id              INT IDENTITY(1,1) PRIMARY KEY,
-    sessionId       UNIQUEIDENTIFIER,
-    societyId       INT NOT NULL,
-    question        NVARCHAR(MAX) NOT NULL,
-    createdOn       DATETIME DEFAULT GETDATE(),
-    isReviewed      BIT DEFAULT 0
+CREATE TABLE IF NOT EXISTS ai_unanswered_questions (
+    id              SERIAL PRIMARY KEY,
+    sessionId       UUID,
+    societyId       INTEGER NOT NULL,
+    question        TEXT NOT NULL,
+    createdOn       TIMESTAMPTZ DEFAULT NOW(),
+    isReviewed      BOOLEAN DEFAULT FALSE
 );
 
 -- Indexes
-CREATE INDEX idx_ai_messages_sessionId ON ai_chat_messages(sessionId);
-CREATE INDEX idx_ai_sessions_userId ON ai_chat_sessions(userId);
+CREATE INDEX IF NOT EXISTS idx_ai_messages_sessionId ON ai_chat_messages(sessionId);
+CREATE INDEX IF NOT EXISTS idx_ai_sessions_userId ON ai_chat_sessions(userId);

@@ -4,45 +4,45 @@
 -- ============================================================
 
 -- Complaint Categories (read from existing API, cached here)
-CREATE TABLE ai_complaint_categories (
-    complaintCategoryId   INT PRIMARY KEY,
-    complaintName         NVARCHAR(100) NOT NULL,
-    isActive              BIT DEFAULT 1,
-    societyId             INT NOT NULL,
-    lastSyncedOn          DATETIME DEFAULT GETDATE()
+CREATE TABLE IF NOT EXISTS ai_complaint_categories (
+    complaintCategoryId   INTEGER PRIMARY KEY,
+    complaintName         VARCHAR(100) NOT NULL,
+    isActive              BOOLEAN DEFAULT TRUE,
+    societyId             INTEGER NOT NULL,
+    lastSyncedOn          TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Complaints table (mirrors QueriesComplaints in original DB)
-CREATE TABLE ai_complaints (
-    queriesComplaintId    INT IDENTITY(1,1) PRIMARY KEY,
-    queriesComplaintGuid  UNIQUEIDENTIFIER DEFAULT NEWID(),
-    reqNumber             NVARCHAR(50),
-    societyId             INT NOT NULL,
-    buildingId            INT NOT NULL,
-    flatId                INT NOT NULL,
-    userId                INT NOT NULL,
-    createdBy             INT NOT NULL,
-    updatedBy             INT NOT NULL,
-    complaintCategoryId   INT NOT NULL,
-    subject               NVARCHAR(255),
-    description           NVARCHAR(MAX),
-    complaintComments     NVARCHAR(MAX),
-    queriesComplaintImage NVARCHAR(500),
-    status                INT DEFAULT 0,   -- 0=New, 1=InProgress, 2=Resolved
-    process               INT DEFAULT 0,
-    userRating            INT DEFAULT 0,
-    isActive              BIT DEFAULT 1,
-    isDeleted             BIT DEFAULT 0,
-    createdOn             DATETIME DEFAULT GETDATE(),
-    updatedOn             DATETIME DEFAULT GETDATE(),
+CREATE TABLE IF NOT EXISTS ai_complaints (
+    queriesComplaintId    SERIAL PRIMARY KEY,
+    queriesComplaintGuid  UUID DEFAULT gen_random_uuid(),
+    reqNumber             VARCHAR(50),
+    societyId             INTEGER NOT NULL,
+    buildingId            INTEGER NOT NULL,
+    flatId                INTEGER NOT NULL,
+    userId                INTEGER NOT NULL,
+    createdBy             INTEGER NOT NULL,
+    updatedBy             INTEGER NOT NULL,
+    complaintCategoryId   INTEGER NOT NULL,
+    subject               VARCHAR(255),
+    description           TEXT,
+    complaintComments     TEXT,
+    queriesComplaintImage VARCHAR(500),
+    status                INTEGER DEFAULT 0,   -- 0=New, 1=InProgress, 2=Resolved
+    process               INTEGER DEFAULT 0,
+    userRating            INTEGER DEFAULT 0,
+    isActive              BOOLEAN DEFAULT TRUE,
+    isDeleted             BOOLEAN DEFAULT FALSE,
+    createdOn             TIMESTAMPTZ DEFAULT NOW(),
+    updatedOn             TIMESTAMPTZ DEFAULT NOW(),
     -- AI-specific fields
-    aiClassifiedCategory  NVARCHAR(100),
+    aiClassifiedCategory  VARCHAR(100),
     aiConfidenceScore     FLOAT,
-    aiRawInput            NVARCHAR(MAX),   -- original user message
-    submittedViaChat      BIT DEFAULT 1
+    aiRawInput            TEXT,   -- original user message
+    submittedViaChat      BOOLEAN DEFAULT TRUE
 );
 
 -- Indexes
-CREATE INDEX idx_ai_complaints_societyId ON ai_complaints(societyId);
-CREATE INDEX idx_ai_complaints_userId ON ai_complaints(userId);
-CREATE INDEX idx_ai_complaints_status ON ai_complaints(status);
+CREATE INDEX IF NOT EXISTS idx_ai_complaints_societyId ON ai_complaints(societyId);
+CREATE INDEX IF NOT EXISTS idx_ai_complaints_userId ON ai_complaints(userId);
+CREATE INDEX IF NOT EXISTS idx_ai_complaints_status ON ai_complaints(status);

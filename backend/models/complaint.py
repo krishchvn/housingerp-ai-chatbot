@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import datetime
 import uuid
@@ -50,3 +50,52 @@ class AIClassifiedComplaint(BaseModel):
     subject: str
     description: str
     confidence: float      # 0.0 - 1.0
+
+
+# ── Text-to-JSON complaint endpoint ─────────────────────────────
+
+class ComplaintTextRequest(BaseModel):
+    """Plain text input from the user."""
+    text: str
+
+
+class ComplaintTextResponse(BaseModel):
+    """Structured JSON returned after classification and DB insert."""
+    reqNumber: str
+    category: str
+    categoryId: int
+    urgency: str
+    subject: str
+    description: str
+    confidence: float
+    savedToDb: bool
+    queriesComplaintId: Optional[int] = None
+    needsClarification: bool = False
+    clarificationMessage: Optional[str] = None
+
+
+# ── Text-to-SQL query endpoint ───────────────────────────────────
+
+class TextToSQLResult(BaseModel):
+    """Internal result from the LLM text-to-SQL conversion."""
+    sql: str
+    filter_type: Optional[str] = None   # user | flatid | buildingid | societyid | subject | category | status | None
+    filter_value: Optional[str] = None  # extracted value (e.g. "Aarav Sharma", "Light issue", "0")
+
+    @field_validator("filter_value", mode="before")
+    @classmethod
+    def coerce_to_str(cls, v):
+        return str(v) if v is not None else None
+
+
+class ComplaintQueryRequest(BaseModel):
+    """Natural language query from the user."""
+    query: str
+
+
+class ComplaintQueryResponse(BaseModel):
+    """Results of a natural language complaint query."""
+    results: List[dict]
+    count: int
+    message: str
+    sql: str                            # exposed for debugging; hide in production

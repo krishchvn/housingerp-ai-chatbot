@@ -18,7 +18,7 @@ uvicorn main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
-cp .env.example .env        # set VITE_API_BASE=http://localhost:8000
+cp .env.example .env        # set VITE_API_BASE=https://housingerp-ai-chatbot.onrender.com
 npm run dev                 # runs on http://localhost:5173
 ```
 

@@ -25,7 +25,7 @@ npm install axios
 In the HousingERP frontend `.env` file, add:
 
 ```
-VITE_CHATBOT_API=http://localhost:8000
+VITE_API_BASE=https://housingerp-ai-chatbot.onrender.com
 ```
 
 For production:

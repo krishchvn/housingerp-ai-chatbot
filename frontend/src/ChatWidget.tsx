@@ -29,7 +29,7 @@ interface Message {
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
+const API_BASE = import.meta.env.VITE_API_BASE ?? "https://housingerp-ai-chatbot.onrender.com";
 
 const COLUMN_LABELS: Record<string, string> = {
   complaintcategoryid: "complaintcategory",

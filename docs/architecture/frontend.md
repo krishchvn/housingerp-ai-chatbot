@@ -75,4 +75,4 @@ const COLUMN_LABELS = { complaintcategoryid: "complaintcategory" };
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| `VITE_API_BASE` | `http://localhost:8000` | Backend base URL |
+| `VITE_API_BASE` | `https://housingerp-ai-chatbot.onrender.com` | Backend base URL |

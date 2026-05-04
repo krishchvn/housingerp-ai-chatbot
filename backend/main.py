@@ -12,7 +12,7 @@ app = FastAPI(title="HousingERP AI Chatbot API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:5173").split(","),
+    allow_origins=[o.strip() for o in os.getenv("CORS_ORIGINS", "https://housingerp-ai-chatbot-web.onrender.com").split(",")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

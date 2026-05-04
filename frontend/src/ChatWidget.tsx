@@ -1,8 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
-
 interface ComplaintCreatedData {
   reqNumber: string;
   category: string;

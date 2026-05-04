@@ -1,12 +1,9 @@
 import { useSelector } from "react-redux";
 import ChatWidget from "./ChatWidget";
 
-// ── Adjust these selectors to match your actual Redux state shape ─────────────
-// Run `console.log(store.getState())` in browser devtools to confirm field names.
-
 interface RootState {
   auth: {
-    token: string;           // JWT token — check your Redux auth slice
+    token: string;
     isAuthenticated: boolean;
   };
   user: {
